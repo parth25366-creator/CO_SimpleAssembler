@@ -113,30 +113,43 @@ def assemble(lines):
             if op in R_TYPE:
                 rd,rs1,rs2=p[1:4]
                 b=encode_r(op,rd,rs1,rs2)
+
             elif op in I_TYPE and op!="lw":
                 rd,rs1,imm=p[1:4]
                 b=encode_i(op,rd,rs1,imm)
+
             elif op=="lw":
                 rd,imm,rs1=p[1:4]
                 b=encode_i(op,rd,rs1,imm)
+
             elif op=="sw":
                 rs2,imm,rs1=p[1:4]
                 b=encode_s(op,rs1,rs2,imm)
+
             elif op in B_TYPE:
-                rs1,rs2,lab=p[1:4]
-                if lab not in labels:
-                    print(f"Error at line {ln}: Undefined label")
-                    sys.exit()
-                off=labels[lab]-pc
+                rs1,rs2,target=p[1:4]
+
+                if re.match(r'^-?\d+$',target):
+                    off=int(target)
+                else:
+                    if target not in labels:
+                        print(f"Error at line {ln}: Undefined label")
+                        sys.exit()
+                    off=labels[target]-pc
+
                 b=encode_b(op,rs1,rs2,off)
+
             else:
                 print(f"Error at line {ln}: Invalid instruction")
                 sys.exit()
+
             out.append(b)
             pc+=4
+
         except:
             print(f"Error at line {ln}: Invalid syntax")
             sys.exit()
+
     return out
 
 def main():
