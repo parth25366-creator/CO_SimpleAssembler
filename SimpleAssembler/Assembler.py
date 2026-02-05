@@ -49,9 +49,7 @@ I_TYPE={
 "jalr":("000","1100111")
 }
 
-S_TYPE={
-"sw":("010","0100011")
-}
+S_TYPE={"sw":("010","0100011")}
 
 B_TYPE={
 "beq":("000","1100011"),
@@ -96,7 +94,7 @@ def encode_b(op,rs1,rs2,offset):
     offset//=2
     imm=to_binary(offset,13)
 
-    return (
+    return(
         imm[0]+
         imm[2:8]+
         REGISTER_MAP[rs2]+
@@ -192,12 +190,19 @@ def assemble(clean,labels):
 
 
 def main():
-    lines=sys.stdin.readlines()
-    clean,labels=preprocess(lines)
-    machine=assemble(clean,labels)
+    try:
+        lines=sys.stdin.read().splitlines()
 
-    for m in machine:
-        print(m)
+        if not lines:
+            return
+
+        clean,labels=preprocess(lines)
+        machine=assemble(clean,labels)
+
+        sys.stdout.write("\n".join(machine))
+
+    except:
+        pass
 
 
 if __name__=="__main__":
